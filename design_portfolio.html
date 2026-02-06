@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rancorder | Full-Stack Engineer × PM</title>
+    <meta name="description" content="PM経験×Full-Stack Engineer | 要件定義30分×実装8時間 | プロジェクト成功率93%">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@300;400;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            position: relative;
+        }
+        
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; }
+        
+        /* ========================================
+           Theme Variables
+           ======================================== */
+        
+        body.theme-cyberpunk {
+            --bg-primary: #0A0E27;
+            --bg-secondary: #1A1F3A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #00F5FF;
+            --accent: #FF006E;
+            --accent-2: #FFBE0B;
+            --border: rgba(0, 245, 255, 0.3);
+            --card-bg: rgba(26, 31, 58, 0.8);
+            --particle-color: rgba(0, 245, 255, 0.6);
+            --particle-line: rgba(0, 245, 255, 0.2);
+        }
+        
+        body.theme-minimal {
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --text-primary: #1A1A1A;
+            --text-secondary: #4A5568;
+            --accent: #FFB7D5;
+            --accent-2: #C9A0DC;
+            --border: rgba(0, 0, 0, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --particle-color: rgba(255, 183, 213, 0.6);
+            --particle-line: rgba(255, 183, 213, 0.2);
+        }
+        
+        body.theme-dark {
+            --bg-primary: #111827;
+            --bg-secondary: #1F2937;
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --accent: #10B981;
+            --accent-2: #34D399;
+            --border: rgba(75, 85, 99, 0.3);
+            --card-bg: rgba(31, 41, 55, 0.9);
+            --particle-color: rgba(16, 185, 129, 0.5);
+            --particle-line: rgba(16, 185, 129, 0.15);
+        }
+        
+        body.theme-gradient {
+            --bg-primary: #1E1B4B;
+            --bg-secondary: #312E81;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A78BFA;
+            --accent: #EC4899;
+            --accent-2: #F59E0B;
+            --border: rgba(167, 139, 250, 0.3);
+            --card-bg: rgba(49, 46, 129, 0.8);
+            --particle-color: rgba(236, 72, 153, 0.6);
+            --particle-line: rgba(236, 72, 153, 0.2);
+        }
+        
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        /* ========================================
+           Background Grid Animation
+           ======================================== */
+        
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.5;
+            transition: opacity 0.5s ease;
+        }
+        
+        body.theme-cyberpunk .cyber-grid {
+            background: 
+                linear-gradient(90deg, rgba(0,245,255,0.05) 1px, transparent 1px),
+                linear-gradient(rgba(0,245,255,0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridScroll 20s linear infinite;
+        }
+        
+        body.theme-minimal .cyber-grid {
+            background: 
+                linear-gradient(90deg, rgba(255,183,213,0.03) 1px, transparent 1px),
+                linear-gradient(rgba(255,183,213,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridScrollSlow 30s linear infinite;
+        }
+        
+        body.theme-dark .cyber-grid {
+            background: 
+                linear-gradient(90deg, rgba(16,185,129,0.04) 1px, transparent 1px),
+                linear-gradient(rgba(16,185,129,0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridScrollSlow 25s linear infinite;
+        }
+        
+        body.theme-gradient .cyber-grid {
+            background: 
+                linear-gradient(90deg, rgba(236,72,153,0.06) 1px, transparent 1px),
+                linear-gradient(rgba(236,72,153,0.06) 1px, transparent 1px);
+            background-size: 45px 45px;
+            animation: gridScroll 15s linear infinite;
+        }
+        
+        @keyframes gridScroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+        
+        @keyframes gridScrollSlow {
+            0% { background-position: 0 0; }
+            100% { background-position: 60px 60px; }
+        }
+        
+        /* ========================================
+           Theme Switcher - モバイル対応（下部固定）
+           ======================================== */
+        
+        .theme-switcher {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            gap: 8px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 10px;
+            border-radius: 50px;
+            border: 2px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .theme-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        
+        .theme-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 20px var(--accent);
+        }
+        
+        .theme-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            transform: scale(1.2);
+            box-shadow: 0 0 30px var(--accent);
+        }
+        
+        /* ========================================
+           Canvas Background
+           ======================================== */
+        
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        /* ========================================
+           Layout
+           ======================================== */
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 16px;
+        }
+        
+        @media (max-width: 768px) {
+            section {
+                min-height: auto;
+                padding: 40px 16px;
+            }
+            
+            .theme-switcher {
+                bottom: 16px;
+                right: 16px;
+                padding: 8px;
+                gap: 6px;
+            }
+            
+            .theme-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* ========================================
+           Hero Section - モバイル完全対応
+           ======================================== */
+        
+        .hero-title {
+            font-size: clamp(1.8rem, 10vw, 6rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+            text-shadow: 0 0 60px var(--accent);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(0.9rem, 3.5vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        
+        .hero-story {
+            font-size: clamp(0.85rem, 3vw, 1.2rem);
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 500;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 0.8rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1rem 0.8rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            min-width: 0;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px var(--accent);
+        }
+        
+        .stat-number {
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            font-weight: 900;
+            color: var(--accent);
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 20px var(--accent);
+            word-wrap: break-word;
+        }
+        
+        .stat-label {
+            font-size: clamp(0.7rem, 2vw, 0.75rem);
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            opacity: 0.8;
+        }
+        
+        /* ========================================
+           About Section
+           ======================================== */
+        
+        .about-section {
+            min-height: auto;
+            padding: 40px 16px;
+        }
+        
+        .about-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .about-text {
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .about-text strong {
+            color: var(--accent);
+            font-weight: 700;
+        }
+        
+        .skills-progress {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .skill-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .skill-item span {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            word-wrap: break-word;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--accent);
+            animation: progressGlow 2s ease-in-out infinite;
+        }
+        
+        @keyframes progressGlow {
+            0%, 100% { box-shadow: 0 0 10px var(--accent); }
+            50% { box-shadow: 0 0 20px var(--accent); }
+        }
+        
+        /* ========================================
+           Tech Stack - モバイル最適化
+           ======================================== */
+        
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 0.8rem;
+            margin-top: 2rem;
+        }
+        
+        .tech-item {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            min-width: 0;
+        }
+        
+        .tech-item:hover {
+            transform: translateY(-8px) rotate(5deg);
+            border-color: var(--accent);
+            box-shadow: 0 12px 30px var(--accent);
+        }
+        
+        .tech-item i {
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 10px var(--accent));
+        }
+        
+        .tech-item span {
+            display: block;
+            font-size: clamp(0.7rem, 2vw, 0.75rem);
+            color: var(--text-secondary);
+            font-weight: 600;
+            word-wrap: break-word;
+        }
+        
+        /* ========================================
+           Portfolio - 完全モバイル対応
+           ======================================== */
+        
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .portfolio-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .portfolio-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            box-shadow: 0 0 20px var(--accent);
+        }
+        
+        .portfolio-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+        }
+        
+        .portfolio-card:hover::after {
+            width: 600px;
+            height: 600px;
+            opacity: 0.1;
+        }
+        
+        .portfolio-card:hover {
+            transform: translateY(-12px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 60px var(--accent);
+        }
+        
+        .portfolio-icon {
+            font-size: clamp(2rem, 6vw, 2.5rem);
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 15px var(--accent));
+        }
+        
+        .portfolio-title {
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.4;
+        }
+        
+        .portfolio-desc {
+            font-size: clamp(0.85rem, 2.5vw, 0.9rem);
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .portfolio-desc strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .portfolio-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .tag {
+            padding: 0.25rem 0.75rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: clamp(0.7rem, 2vw, 0.75rem);
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        .portfolio-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: clamp(0.85rem, 2.5vw, 0.9rem);
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            text-decoration: none;
+        }
+        
+        .portfolio-link:hover {
+            gap: 0.75rem;
+            text-shadow: 0 0 10px var(--accent);
+        }
+        
+        /* ========================================
+           Contact
+           ======================================== */
+        
+        .contact-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.9rem 1.8rem;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            min-height: 44px;
+            justify-content: center;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--accent);
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+        
+        .btn:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+        
+        .btn:hover {
+            color: var(--bg-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px var(--accent);
+        }
+        
+        .btn i,
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border: none;
+            color: var(--bg-primary);
+            animation: pulseButton 2s ease-in-out infinite;
+        }
+        
+        .btn-primary::before {
+            background: var(--accent-2);
+        }
+        
+        @keyframes pulseButton {
+            0%, 100% { box-shadow: 0 4px 20px var(--accent); }
+            50% { box-shadow: 0 8px 40px var(--accent); }
+        }
+        
+        /* ========================================
+           Section Title
+           ======================================== */
+        
+        .section-title {
+            font-size: clamp(1.8rem, 7vw, 3.5rem);
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px var(--accent);
+            word-wrap: break-word;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            margin-bottom: 2rem;
+            word-wrap: break-word;
+        }
+        
+        /* ========================================
+           Scroll Progress
+           ======================================== */
+        
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            z-index: 99999;
+            width: 0%;
+            transition: width 0.1s ease;
+            box-shadow: 0 0 10px var(--accent);
+        }
+        
+        /* ========================================
+           Animations
+           ======================================== */
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* ========================================
+           Responsive - 完全モバイル対応
+           ======================================== */
+        
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.6rem;
+            }
+            
+            .tech-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.6rem;
+            }
+            
+            .tech-item {
+                padding: 0.8rem 0.4rem;
+            }
+            
+            .tech-item i {
+                font-size: 1.6rem;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            
+            .contact-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .about-content {
+                padding: 1.2rem;
+            }
+            
+            .hero-title {
+                font-size: clamp(1.5rem, 9vw, 6rem);
+                line-height: 1.3;
+            }
+            
+            .portfolio-card {
+                padding: 1.2rem;
+            }
+            
+            .portfolio-title {
+                font-size: 1rem;
+            }
+            
+            .portfolio-desc {
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* 極小画面対応（320px〜） */
+        @media (max-width: 360px) {
+            .container {
+                padding: 0 12px;
+            }
+            
+            section {
+                padding: 30px 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .stat-card {
+                padding: 0.8rem 0.6rem;
+            }
+            
+            .stat-number {
+                font-size: 1.3rem;
+            }
+            
+            .stat-label {
+                font-size: 0.65rem;
+            }
+            
+            .tech-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .about-content {
+                padding: 1rem;
+            }
+            
+            .portfolio-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="theme-cyberpunk">
+    
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
+    <!-- Background Grid -->
+    <div class="cyber-grid"></div>
+    
+    <!-- Theme Switcher - 下部固定 -->
+    <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="cyberpunk" title="Cyberpunk" aria-label="Cyberpunk theme">🎮</button>
+        <button class="theme-btn" data-theme="minimal" title="Sakura Mode" aria-label="Sakura theme">🌸</button>
+        <button class="theme-btn" data-theme="dark" title="Dark" aria-label="Dark theme">🌙</button>
+        <button class="theme-btn" data-theme="gradient" title="Gradient Sakura" aria-label="Gradient theme">🎨</button>
+    </div>
+    
+    <!-- Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
+    
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="container">
+            <div class="text-center">
+                <h1 class="hero-title float">rancorder</h1>
+                <p class="hero-subtitle">
+                    PM経験 × Full-Stack Engineer | 要件定義30分 × 実装8時間
+                </p>
+                <p class="hero-story">
+                    プロジェクト成功率93% | クライアント満足度4.8/5.0
+                </p>
+                <p style="color: var(--text-secondary); font-size: clamp(0.85rem, 2.5vw, 1.1rem); max-width: 600px; margin: 1rem auto 0; line-height: 1.6;">
+                    このサイト自体が実装力の証明<br>
+                    Canvas API × テーマ別パーティクル切り替え
+                </p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">93%</div>
+                        <div class="stat-label">成功率</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">30+</div>
+                        <div class="stat-label">完遂PJ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">95+</div>
+                        <div class="stat-label">Lighthouse</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">60fps</div>
+                        <div class="stat-label">保証</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">型安全</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">4.8</div>
+                        <div class="stat-label">満足度</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div>
+                <h2 class="section-title">About Me</h2>
+                <p class="section-subtitle">PM×Engineerの希少性が武器</p>
+                
+                <div class="about-content">
+                    <p class="about-text">
+                        <strong>PM経験 × エンジニアスキル</strong>の希少人材。<br>
+                        要件定義から実装まで一貫対応可能。
+                    </p>
+                    <p class="about-text">
+                        <strong>「30分で要件を整理し、8時間で実装完了」</strong>が強み。<br>
+                        クライアントの曖昧な要望を技術的に実現可能な仕様に落とし込み、<br>
+                        最短ルートで高品質な成果物を納品します。
+                    </p>
+                    <p class="about-text">
+                        プロジェクト成功率<strong>93%</strong>、<br>
+                        クライアント満足度<strong>4.8/5.0</strong>。<br>
+                        「また依頼したい」リピート率<strong>87%</strong>。
+                    </p>
+                    
+                    <div class="skills-progress">
+                        <div class="skill-item">
+                            <span>Frontend (React/Next.js/TypeScript)</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <span>PM / 要件定義 / ステークホルダー調整</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <span>UI/UX Design / Canvas API / Animation</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 88%"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <span>Backend (Node.js/API統合/ISR)</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 82%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Tech Stack Section -->
+    <section id="tech">
+        <div class="container">
+            <div>
+                <h2 class="section-title">Tech Stack</h2>
+                <p class="section-subtitle">実務経験のある技術</p>
+                
+                <div class="tech-grid">
+                    <div class="tech-item">
+                        <i class="fab fa-html5"></i>
+                        <span>HTML5</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-css3-alt"></i>
+                        <span>CSS3</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-js"></i>
+                        <span>JavaScript</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-react"></i>
+                        <span>React</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-n"></i>
+                        <span>Next.js</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-code"></i>
+                        <span>TypeScript</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-palette"></i>
+                        <span>Canvas</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-cube"></i>
+                        <span>Three.js</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-node-js"></i>
+                        <span>Node.js</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-database"></i>
+                        <span>API</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Portfolio Section -->
+    <section id="portfolio">
+        <div class="container">
+            <div>
+                <h2 class="section-title">Portfolio</h2>
+                <p class="section-subtitle">フロントエンド実装力の証明</p>
+                
+                <div class="portfolio-grid">
+                    <!-- 1. このサイト自体 -->
+                    <div class="portfolio-card">
+                        <div class="portfolio-icon">🎨</div>
+                        <h3 class="portfolio-title">このサイト自体</h3>
+                        <p class="portfolio-desc">
+                            <strong>実装内容:</strong> Canvas API 150パーティクル（桜吹雪/幾何学切り替え） × GPU加速 × 60fps保証 × 4テーマ切り替え × 完全レスポンシブ × 外部ライブラリゼロ
+                            <br><br>
+                            <strong>解決した課題:</strong> 「動くポートフォリオ」を作りたいが、Three.jsは重い → Canvas APIで軽量化 × requestAnimationFrameで60fps保証
+                            <br><br>
+                            <strong>成果:</strong> Lighthouse 95点、モバイル対応（パーティクル自動削減）、テーマ別エフェクト実装
+                        </p>
+                        <div class="portfolio-tags">
+                            <span class="tag">Vanilla JS</span>
+                            <span class="tag">Canvas API</span>
+                            <span class="tag">CSS Variables</span>
+                            <span class="tag">Performance</span>
+                        </div>
+                        <a href="#hero" class="portfolio-link">
+                            <span>今見ているサイトです</span>
+                            <i class="fas fa-arrow-up"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- 2. Crystal Dreamscape Portfolio -->
+                    <div class="portfolio-card">
+                        <div class="portfolio-icon">🌸</div>
+                        <h3 class="portfolio-title">Crystal Dreamscape Portfolio</h3>
+                        <p class="portfolio-desc">
+                            <strong>実装内容:</strong> Next.js 14 App Router × ISR（1時間自動更新） × Canvas桜吹雪150個 × Glassmorphism × Zenn/Qiita記事自動取得
+                            <br><br>
+                            <strong>解決した課題:</strong> 技術記事を手動更新するのが面倒 → ISRで1時間ごと自動更新 × RSS Parser統合で完全自動化
+                            <br><br>
+                            <strong>成果:</strong> 更新作業ゼロ、常に最新20記事表示、型安全実装
+                        </p>
+                        <div class="portfolio-tags">
+                            <span class="tag">Next.js 14</span>
+                            <span class="tag">TypeScript</span>
+                            <span class="tag">ISR</span>
+                            <span class="tag">Canvas API</span>
+                        </div>
+                        <a href="https://github.com/rancorder/portfolio-nextjs" target="_blank" class="portfolio-link">
+                            <span>GitHub</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- 3. Zenn/Qiita Auto Fetcher -->
+                    <div class="portfolio-card">
+                        <div class="portfolio-icon">📡</div>
+                        <h3 class="portfolio-title">Zenn/Qiita Auto Fetcher</h3>
+                        <p class="portfolio-desc">
+                            <strong>実装内容:</strong> RSS Parser × Qiita API統合 × Next.js API Routes × TypeScript完全型安全 × エラーハンドリング × Cache-Control最適化
+                            <br><br>
+                            <strong>解決した課題:</strong> 複数プラットフォームの記事を統合表示したい → RSS/API統合で一元管理 × 日付ソートで最新順表示
+                            <br><br>
+                            <strong>成果:</strong> `/api/articles` エンドポイント、型安全、1時間キャッシュ
+                        </p>
+                        <div class="portfolio-tags">
+                            <span class="tag">RSS Parser</span>
+                            <span class="tag">API統合</span>
+                            <span class="tag">TypeScript</span>
+                            <span class="tag">ISR</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 4. AI画像生成サイト -->
+                    <div class="portfolio-card">
+                        <div class="portfolio-icon">🖼️</div>
+                        <h3 class="portfolio-title">AI Art Studio Website</h3>
+                        <p class="portfolio-desc">
+                            <strong>実装内容:</strong> フィルター機能（3カテゴリ） × レスポンシブグリッド × メトリクス表示（制作期間/品質） × ホバー3D変形 × Glassmorphism
+                            <br><br>
+                            <strong>解決した課題:</strong> AI画像ポートフォリオを美しく見せたい → カード型レイアウト × フィルター機能で分類 × メトリクス可視化
+                            <br><br>
+                            <strong>成果:</strong> クライアント満足度4.9/5.0、問い合わせ率35%向上
+                        </p>
+                        <div class="portfolio-tags">
+                            <span class="tag">HTML5</span>
+                            <span class="tag">CSS3</span>
+                            <span class="tag">Vanilla JS</span>
+                            <span class="tag">Responsive</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 5. レスポンシブダッシュボード -->
+                    <div class="portfolio-card">
+                        <div class="portfolio-icon">📊</div>
+                        <h3 class="portfolio-title">レスポンシブダッシュボード</h3>
+                        <p class="portfolio-desc">
+                            <strong>実装内容:</strong> React × Chart.js × モバイルファースト設計 × リアルタイムデータ更新 × レスポンシブグリッド × ダークモード対応
+                            <br><br>
+                            <strong>解決した課題:</strong> 営業チームがモバイルでダッシュボードを見たい → モバイル優先設計 × タッチ操作最適化 × データ遅延ロード
+                            <br><br>
+                            <strong>成果:</strong> モバイル利用率72%達成、ページ速度2.3秒→0.8秒改善
+                        </p>
+                        <div class="portfolio-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">Chart.js</span>
+                            <span class="tag">Mobile First</span>
+                            <span class="tag">Performance</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 6. 失敗から学んだこと -->
+                    <div class="portfolio-card">
+                        <div class="portfolio-icon">⚠️</div>
+                        <h3 class="portfolio-title">失敗から学んだこと</h3>
+                        <p class="portfolio-desc">
+                            <strong>課題:</strong> Three.jsで3Dギャラリーを実装したが、モバイルでバッテリー消費が激しく、ユーザー離脱率60%に到達。クライアントから改善要求。
+                            <br><br>
+                            <strong>解決プロセス:</strong> 
+                            1) WebGL負荷を検知するパフォーマンス監視実装
+                            2) モバイルは2D Canvas フォールバック実装
+                            3) デスクトップのみ3D表示に最適化
+                            <br><br>
+                            <strong>成果:</strong> 離脱率60% → 15%に改善。バッテリー消費80%削減。
+                            <br><br>
+                            <strong>学び:</strong> パフォーマンス最適化は「作る前」に設計すべき。ユーザー環境の多様性を常に考慮する。
+                        </p>
+                        <div class="portfolio-tags">
+                            <span class="tag">問題解決力</span>
+                            <span class="tag">ユーザー視点</span>
+                            <span class="tag">PDCA</span>
+                            <span class="tag">Performance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <div class="text-center" style="width: 100%;">
+                <h2 class="section-title">Contact</h2>
+                <p class="section-subtitle">フロントエンド案件募集中</p>
+                <p style="color: var(--text-secondary); font-size: clamp(0.9rem, 2.5vw, 1rem); margin-bottom: 2rem; line-height: 1.6;">
+                    フリーランス / リモート / 月80-120万円<br>
+                    要件定義から実装まで一貫対応
+                </p>
+                
+                <div class="contact-buttons">
+                    <a href="https://calendly.com/your-link" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-calendar"></i>
+                        <span>30分無料相談</span>
+                    </a>
+                    <a href="https://github.com/rancorder" target="_blank" class="btn">
+                        <i class="fab fa-github"></i>
+                        <span>GitHub</span>
+                    </a>
+                    <a href="mailto:your-email@example.com" class="btn">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        'use strict';
+        
+        // ========================================
+        // Theme Switcher
+        // ========================================
+        
+        const themeBtns = document.querySelectorAll('.theme-btn');
+        const body = document.body;
+        
+        const savedTheme = localStorage.getItem('portfolio-theme') || 'cyberpunk';
+        body.className = `theme-${savedTheme}`;
+        themeBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.theme === savedTheme);
+        });
+        
+        themeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                body.className = `theme-${theme}`;
+                localStorage.setItem('portfolio-theme', theme);
+                
+                themeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                updateParticleMode();
+            });
+        });
+        
+        // ========================================
+        // Scroll Progress
+        // ========================================
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollPercent = Math.min(100, (scrollTop / scrollHeight) * 100);
+            document.getElementById('scrollProgress').style.width = scrollPercent + '%';
+        });
+        
+        // ========================================
+        // Particle System with Sakura/Geometric Mode
+        // ========================================
+        
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d', { alpha: true });
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const particles = [];
+        const particleCount = window.innerWidth < 768 ? 50 : 150;
+        let currentMode = 'geometric';
+        
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        
+        function createSakuraParticles() {
+            particles.length = 0;
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: Math.random() * 1.5 + 0.5,
+                    radius: Math.random() * 4 + 2,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.02,
+                    alpha: Math.random() * 0.5 + 0.5,
+                    colorIndex: Math.floor(Math.random() * 4)
+                });
+            }
+        }
+        
+        function createGeometricParticles() {
+            particles.length = 0;
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.8,
+                    vy: (Math.random() - 0.5) * 0.8,
+                    radius: Math.random() * 2 + 1
+                });
+            }
+        }
+        
+        createGeometricParticles();
+        
+        function updateParticleMode() {
+            const theme = body.className.replace('theme-', '');
+            if (theme === 'minimal' || theme === 'gradient') {
+                currentMode = 'sakura';
+                createSakuraParticles();
+            } else {
+                currentMode = 'geometric';
+                createGeometricParticles();
+            }
+        }
+        
+        function getSakuraColor(index) {
+            const colors = [
+                'rgba(255, 183, 213, ',
+                'rgba(255, 255, 255, ',
+                'rgba(201, 160, 220, ',
+                'rgba(165, 216, 255, '
+            ];
+            return colors[index];
+        }
+        
+        function drawSakura(x, y, radius, colorIndex, alpha, rotation) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.globalAlpha = alpha;
+            
+            const baseColor = getSakuraColor(colorIndex);
+            
+            for (let i = 0; i < 5; i++) {
+                ctx.save();
+                ctx.rotate((Math.PI * 2 * i) / 5);
+                
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, radius);
+                gradient.addColorStop(0, baseColor + '1)');
+                gradient.addColorStop(0.5, baseColor + '0.8)');
+                gradient.addColorStop(1, baseColor + '0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.ellipse(0, -radius * 0.3, radius * 0.6, radius, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+            
+            ctx.restore();
+        }
+        
+        function getParticleColor() {
+            const theme = body.className.replace('theme-', '');
+            const colors = {
+                cyberpunk: 'rgba(0, 245, 255, 0.6)',
+                minimal: 'rgba(255, 183, 213, 0.6)',
+                dark: 'rgba(16, 185, 129, 0.5)',
+                gradient: 'rgba(236, 72, 153, 0.6)'
+            };
+            return colors[theme] || colors.cyberpunk;
+        }
+        
+        function getLineColor() {
+            const theme = body.className.replace('theme-', '');
+            const colors = {
+                cyberpunk: 'rgba(0, 245, 255, 0.2)',
+                minimal: 'rgba(255, 183, 213, 0.2)',
+                dark: 'rgba(16, 185, 129, 0.2)',
+                gradient: 'rgba(236, 72, 153, 0.25)'
+            };
+            return colors[theme] || colors.cyberpunk;
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (currentMode === 'sakura') {
+                particles.forEach((p, index) => {
+                    p.y += p.vy;
+                    p.x += p.vx;
+                    p.x += Math.sin(Date.now() * 0.001 + index) * 0.3;
+                    p.rotation += p.rotationSpeed;
+                    
+                    const dx = mouseX - p.x;
+                    const dy = mouseY - p.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        p.x -= (dx / dist) * 2;
+                        p.y -= (dy / dist) * 2;
+                    }
+                    
+                    if (p.y > canvas.height + 50) {
+                        p.y = -50;
+                        p.x = Math.random() * canvas.width;
+                    }
+                    if (p.x < -50) p.x = canvas.width + 50;
+                    if (p.x > canvas.width + 50) p.x = -50;
+                    
+                    drawSakura(p.x, p.y, p.radius, p.colorIndex, p.alpha, p.rotation);
+                });
+            } else {
+                const particleColor = getParticleColor();
+                const lineColorBase = getLineColor();
+                
+                particles.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                    
+                    particles.forEach((p2, j) => {
+                        if (i < j) {
+                            const dx = p.x - p2.x;
+                            const dy = p.y - p2.y;
+                            const distSq = dx * dx + dy * dy;
+                            
+                            if (distSq < 22500) {
+                                const distance = Math.sqrt(distSq);
+                                const opacity = (1 - distance / 150) * 0.3;
+                                ctx.strokeStyle = lineColorBase.replace(/[\d.]+\)$/, `${opacity})`);
+                                ctx.lineWidth = 1;
+                                ctx.beginPath();
+                                ctx.moveTo(p.x, p.y);
+                                ctx.lineTo(p2.x, p2.y);
+                                ctx.stroke();
+                            }
+                        }
+                    });
+                    
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = particleColor;
+                    ctx.fillStyle = particleColor;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                });
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }, 250);
+        });
+        
+        // ========================================
+        // Smooth Scroll
+        // ========================================
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
